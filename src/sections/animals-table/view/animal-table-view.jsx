@@ -11,6 +11,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
 import { users } from 'src/_mock/user';
+import useAuthStore from 'src/store/authStore';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -19,12 +20,22 @@ import TableNoData from '../table-no-data';
 import UserTableRow from '../user-table-row';
 import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
-import UserTableToolbar from '../user-table-toolbar';
+import AnimalTableToolbar from '../animal-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
+import NewAnimalModal from '../AddAnimalModal';
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function AnimalsTable() {
+  //
+
+  const { user } = useAuthStore();
+  const categories = user.categories;
+  const animals = categories.flatMap((category) => category.animals);
+
+  console.log(animals);
+  //
+
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -96,16 +107,14 @@ export default function UserPage() {
 
   return (
     <Container>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Users</Typography>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5} mt={10}>
+        <Typography variant="h4">Animals</Typography>
 
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New User
-        </Button>
+        <NewAnimalModal />
       </Stack>
 
       <Card>
-        <UserTableToolbar
+        <AnimalTableToolbar
           numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
@@ -123,10 +132,10 @@ export default function UserPage() {
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
+                  { id: 'Category', label: 'Category' },
+                  { id: 'born_date', label: 'Born Date' },
+                  { id: 'healthStatus', label: 'Health Status', align: 'center' },
+                  { id: 'collar Id', label: 'Collar Id' },
                   { id: '' },
                 ]}
               />

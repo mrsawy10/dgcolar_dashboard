@@ -1,2 +1,15 @@
 /* scrollbar */
 @import 'simplebar-react/dist/simplebar.min.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+div.swal2-container {
+  display: grid;
+  position: fixed;
+  z-index: 1200;
+}
+
+.filepond--credits{
+  display: none !important;
+}

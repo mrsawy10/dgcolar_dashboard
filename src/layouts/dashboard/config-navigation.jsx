@@ -1,5 +1,7 @@
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+import PetsIcon from '@mui/icons-material/Pets';
 import SvgColor from 'src/components/svg-color';
-
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 // ----------------------------------------------------------------------
 
 const icon = (name) => (
@@ -13,30 +15,30 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
-    title: 'user',
-    path: '/user',
-    icon: icon('ic_user'),
+    title: 'Animals',
+    path: '/animals',
+    icon: <PetsIcon />,
   },
   {
-    title: 'product',
-    path: '/products',
-    icon: icon('ic_cart'),
+    title: 'To Do List',
+    path: '/todo',
+    icon: <PlaylistAddCheckIcon />,
   },
   {
-    title: 'blog',
-    path: '/blog',
-    icon: icon('ic_blog'),
+    title: 'Finances',
+    path: '/finances',
+    icon: <RequestQuoteIcon />,
   },
-  {
-    title: 'login',
-    path: '/login',
-    icon: icon('ic_lock'),
-  },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
-  },
+  // {
+  //   title: 'login',
+  //   path: '/login',
+  //   icon: icon('ic_lock'),
+  // },
+  // {
+  //   title: 'Not found',
+  //   path: '/404',
+  //   icon: icon('ic_disabled'),
+  // },
 ];
 
 export default navConfig;

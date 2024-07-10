@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -19,18 +19,20 @@ import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
-import { Login } from 'src/store/authStore';
+import NumberInput from 'src/components/NumberInput';
+import useAuthStore, { Register } from 'src/store/authStore';
+import useGeneralStore from 'src/store/generalStore';
 
 // ----------------------------------------------------------------------
 
-export default function LoginView() {
+export default function RegisterView() {
   const theme = useTheme();
-
-  // const router = useRouter();
+  const { setGeneralIsLoading, generalIsLoading } = useGeneralStore();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleClick = async () => {};
+  const { user, isLoading, error, token, isSuccess, isError } = useAuthStore();
 
   const renderForm = (
     <form
@@ -39,12 +41,12 @@ export default function LoginView() {
         const fd = new FormData(e.target);
         const formData = Object.fromEntries(fd.entries());
         // _______________________________________________
-        await Login(formData);
+        await Register(formData);
       }}
     >
       <Stack spacing={3}>
+        <TextField name="full_name" label="Full Name" />
         <TextField name="email" label="Email address" />
-
         <TextField
           name="password"
           label="Password"
@@ -59,23 +61,34 @@ export default function LoginView() {
             ),
           }}
         />
+        <TextField
+          name="confirm_password"
+          label="Confirm Password"
+          type={showConfirmPassword ? 'text' : 'password'}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                  <Iconify icon={showConfirmPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+        <NumberInput name="phoneNumber" label="Phone Number" />
+        <TextField name="address" label="Address" />
+        <TextField name="postal_code" label="Postal Code" />
       </Stack>
-
-      <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
-          Forgot password?
-        </Link>
-      </Stack>
-
+      <div className="my-10"></div>
       <LoadingButton
+        className="mt-24"
         fullWidth
         size="large"
         type="submit"
         variant="contained"
         color="inherit"
-        // onClick={}
       >
-        Login
+        Sign Up
       </LoadingButton>
     </form>
   );
@@ -106,12 +119,12 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
+          <Typography variant="h4">Sign Up to DG Collar</Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
-            <Link href="/register" variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
+            Already have an account?
+            <Link href="/login" variant="subtitle2" sx={{ ml: 0.5 }}>
+              Login
             </Link>
           </Typography>
           {renderForm}

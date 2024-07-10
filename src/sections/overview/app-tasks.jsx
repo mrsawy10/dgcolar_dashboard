@@ -11,18 +11,15 @@ import CardHeader from '@mui/material/CardHeader';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import Iconify from 'src/components/iconify';
+import { deleteToDo, toggleToDoIsCompleted } from 'src/actions/toDoActions';
 
 // ----------------------------------------------------------------------
 
 export default function AnalyticsTasks({ title, subheader, list, ...other }) {
-  const [selected, setSelected] = useState(['2']);
+  // const [selected, setSelected] = useState(['2']);
 
-  const handleClickComplete = (taskId) => {
-    const tasksCompleted = selected.includes(taskId)
-      ? selected.filter((value) => value !== taskId)
-      : [...selected, taskId];
-
-    setSelected(tasksCompleted);
+  const handleClickComplete = async (task) => {
+    await toggleToDoIsCompleted(task);
   };
 
   return (
@@ -32,9 +29,13 @@ export default function AnalyticsTasks({ title, subheader, list, ...other }) {
       {list.map((task) => (
         <TaskItem
           key={task.id}
+          id={task.id}
+          isCompleted={task.isCompleted}
           task={task}
-          checked={selected.includes(task.id)}
-          onChange={() => handleClickComplete(task.id)}
+          checked={task.isCompleted}
+          onChange={() =>
+            handleClickComplete({ task: task.name, id: task.id, isCompleted: !task.isCompleted })
+          }
         />
       ))}
     </Card>
@@ -49,7 +50,7 @@ AnalyticsTasks.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function TaskItem({ task, checked, onChange }) {
+function TaskItem({ task, checked, onChange, id }) {
   const [open, setOpen] = useState(null);
 
   const handleOpenMenu = (event) => {
@@ -60,23 +61,24 @@ function TaskItem({ task, checked, onChange }) {
     setOpen(null);
   };
 
-  const handleMarkComplete = () => {
-    handleCloseMenu();
-    console.info('MARK COMPLETE', task.id);
-  };
+  // const handleMarkComplete = () => {
+  //   handleCloseMenu();
+  //   console.info('MARK COMPLETE', task.id);
+  // };
 
-  const handleShare = () => {
-    handleCloseMenu();
-    console.info('SHARE', task.id);
-  };
+  // const handleShare = () => {
+  //   handleCloseMenu();
+  //   console.info('SHARE', task.id);
+  // };
 
-  const handleEdit = () => {
-    handleCloseMenu();
-    console.info('EDIT', task.id);
-  };
+  // const handleEdit = () => {
+  //   handleCloseMenu();
+  //   console.info('EDIT', task.id);
+  // };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     handleCloseMenu();
+    await deleteToDo(id);
     console.info('DELETE', task.id);
   };
 
@@ -116,21 +118,6 @@ function TaskItem({ task, checked, onChange }) {
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem onClick={handleMarkComplete}>
-          <Iconify icon="eva:checkmark-circle-2-fill" sx={{ mr: 2 }} />
-          Mark Complete
-        </MenuItem>
-
-        <MenuItem onClick={handleEdit}>
-          <Iconify icon="solar:pen-bold" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem onClick={handleShare}>
-          <Iconify icon="solar:share-bold" sx={{ mr: 2 }} />
-          Share
-        </MenuItem>
-
         <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
           <Iconify icon="solar:trash-bin-trash-bold" sx={{ mr: 2 }} />
           Delete
@@ -144,4 +131,5 @@ TaskItem.propTypes = {
   checked: PropTypes.bool,
   onChange: PropTypes.func,
   task: PropTypes.object,
+  id: PropTypes.string,
 };

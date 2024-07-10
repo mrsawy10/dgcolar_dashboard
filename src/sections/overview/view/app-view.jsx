@@ -212,18 +212,7 @@ export default function AppView() {
           />
         </Grid>
 
-        <Grid xs={12} md={6} lg={8}>
-          <AppTasks
-            title="Tasks"
-            list={[
-              { id: '1', name: 'Create FireStone Logo' },
-              { id: '2', name: 'Add SCSS and JS files if required' },
-              { id: '3', name: 'Stakeholder Meeting' },
-              { id: '4', name: 'Scoping & Estimations' },
-              { id: '5', name: 'Sprint Showcase' },
-            ]}
-          />
-        </Grid>
+        
       </Grid>
     </Container>
   );
