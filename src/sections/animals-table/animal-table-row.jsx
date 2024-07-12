@@ -13,20 +13,28 @@ import IconButton from '@mui/material/IconButton';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
+import { S3_URL } from 'src/constants/index';
+import useGeneralStore from 'src/store/generalStore';
+import { deleteAnimal } from 'src/actions/animalsActions';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({
+export default function AnimalTableRow({
   selected,
   name,
-  avatarUrl,
-  company,
-  role,
-  isVerified,
-  status,
-  handleClick,
+  categoryName,
+  gallery,
+  healthStatus,
+  collarId,
+  birth_date,
+  categoryId,
+  id,
 }) {
   const [open, setOpen] = useState(null);
+  const { setGeneralIsLoading } = useGeneralStore();
+  const navigate = useNavigate();
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -36,15 +44,42 @@ export default function UserTableRow({
     setOpen(null);
   };
 
+  const date = new Date(birth_date);
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+  const readableDate = date.toLocaleDateString('en-US', options);
+
+  let avatarUrl;
+  if (Array.isArray(gallery) && gallery.length > 0) {
+    avatarUrl = `${S3_URL}${gallery[0]}`;
+  }
+
+  const deleteAnimalAction = async () => {
+    setGeneralIsLoading(true);
+    await deleteAnimal(categoryId, id);
+    setGeneralIsLoading(false);
+    toast.success('Animal Deleted Successfully');
+  };
+
   return (
     <>
-      <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
-        <TableCell padding="checkbox">
+      <TableRow
+        onClick={() => navigate(`/animals/${categoryId}/${id}`)}
+        hover
+        tabIndex={-1}
+        role="checkbox"
+        selected={selected}
+        className="cursor-pointer"
+      >
+        {/* <TableCell padding="checkbox">
           <Checkbox disableRipple checked={selected} onChange={handleClick} />
-        </TableCell>
+        </TableCell> */}
 
-        <TableCell component="th" scope="row" padding="none">
-          <Stack direction="row" alignItems="center" spacing={2}>
+        <TableCell component="th" scope="row" padding="none" className="cursor-pointer ">
+          <Stack direction="row" alignItems="center" spacing={2} className="cursor-pointer pl-3">
             <Avatar alt={name} src={avatarUrl} />
             <Typography variant="subtitle2" noWrap>
               {name}
@@ -52,14 +87,11 @@ export default function UserTableRow({
           </Stack>
         </TableCell>
 
-        <TableCell>{company}</TableCell>
-
-        <TableCell>{role}</TableCell>
-
-        <TableCell align="center">{isVerified ? 'Yes' : 'No'}</TableCell>
-
+        <TableCell>{categoryName}</TableCell>
+        <TableCell>{`${readableDate}`.includes(`nvalid`) ? `` : readableDate}</TableCell>
+        <TableCell>{healthStatus}</TableCell>
         <TableCell>
-          <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
+          {collarId ? <Label color="success">Yes</Label> : <Label color="error">No</Label>}
         </TableCell>
 
         <TableCell align="right">
@@ -84,7 +116,7 @@ export default function UserTableRow({
           Edit
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
+        <MenuItem onClick={deleteAnimalAction} sx={{ color: 'error.main' }}>
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
           Delete
         </MenuItem>
@@ -92,14 +124,3 @@ export default function UserTableRow({
     </>
   );
 }
-
-UserTableRow.propTypes = {
-  avatarUrl: PropTypes.any,
-  company: PropTypes.any,
-  handleClick: PropTypes.func,
-  isVerified: PropTypes.any,
-  name: PropTypes.any,
-  role: PropTypes.any,
-  selected: PropTypes.any,
-  status: PropTypes.string,
-};

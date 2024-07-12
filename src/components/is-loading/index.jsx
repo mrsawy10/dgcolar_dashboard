@@ -9,20 +9,24 @@ const LoadingComponent = ({ isVisible }) => {
   const { generalIsLoading } = useGeneralStore();
 
   return generalIsLoading ? (
-    <div className={`absolute inset-0 bg-zinc-900/50 flex justify-center items-center z-[1200]`}>
-      <div className={`${classes[`loader`]}`}>
-        <div className={`${classes['cell']} ${classes['d-0']}`}></div>
-        <div className={`${classes['cell']} ${classes['d-1']}`}></div>
-        <div className={`${classes['cell']} ${classes['d-2']}`}></div>
+    <div
+      className={`absolute inset-0 bg-zinc-900/50 flex justify-center items-start z-[1200] overflow-hidden h-[200vh] `}
+    >
+      <div className={` inset-0  flex justify-center items-center h-[100vh]`}>
+        <div className={`${classes[`loader`]}`}>
+          <div className={`${classes['cell']} ${classes['d-0']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-1']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-2']}`}></div>
 
-        <div className={`${classes['cell']} ${classes['d-1']}`}></div>
-        <div className={`${classes['cell']} ${classes['d-2']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-1']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-2']}`}></div>
 
-        <div className={`${classes['cell']} ${classes['d-2']}`}></div>
-        <div className={`${classes['cell']} ${classes['d-3']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-2']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-3']}`}></div>
 
-        <div className={`${classes['cell']} ${classes['d-3']}`}></div>
-        <div className={`${classes['cell']} ${classes['d-4']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-3']}`}></div>
+          <div className={`${classes['cell']} ${classes['d-4']}`}></div>
+        </div>
       </div>
     </div>
   ) : (

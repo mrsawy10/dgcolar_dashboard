@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -15,9 +15,10 @@ import useAuthStore from 'src/store/authStore';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
+import useAnimalsStore from 'src/store/useAnimalsStore';
 
 import TableNoData from '../table-no-data';
-import UserTableRow from '../user-table-row';
+import UserTableRow from '../animal-table-row';
 import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import AnimalTableToolbar from '../animal-table-toolbar';
@@ -28,12 +29,21 @@ import NewAnimalModal from '../AddAnimalModal';
 
 export default function AnimalsTable() {
   //
+  const { animals, getAnimals } = useAnimalsStore();
+  useEffect(() => {
+    getAnimals();
+  }, []);
 
   const { user } = useAuthStore();
-  const categories = user.categories;
-  const animals = categories.flatMap((category) => category.animals);
+  // const categories = user.categories;
+  // const animals = categories?.flatMap((category) =>
+  //   category.animals.map((animal) => ({
+  //     ...animal,
+  //     categoryId: category._id,
+  //     categoryName: category.name,
+  //   }))
+  // );
 
-  console.log(animals);
   //
 
   const [page, setPage] = useState(0);
@@ -98,7 +108,7 @@ export default function AnimalsTable() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: users,
+    inputData: animals,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -113,70 +123,79 @@ export default function AnimalsTable() {
         <NewAnimalModal />
       </Stack>
 
-      <Card>
-        <AnimalTableToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
+      {Array.isArray(dataFiltered) && dataFiltered.length > 0 ? (
+        <Card>
+          <AnimalTableToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={users.length}
-                numSelected={selected.length}
-                onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAllClick}
-                headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'Category', label: 'Category' },
-                  { id: 'born_date', label: 'Born Date' },
-                  { id: 'healthStatus', label: 'Health Status', align: 'center' },
-                  { id: 'collar Id', label: 'Collar Id' },
-                  { id: '' },
-                ]}
-              />
-              <TableBody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      name={row.name}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
-                    />
-                  ))}
-
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
+          <Scrollbar>
+            <TableContainer sx={{ overflow: 'unset' }}>
+              <Table sx={{ minWidth: 800 }}>
+                <UserTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  rowCount={users.length}
+                  numSelected={selected.length}
+                  onRequestSort={handleSort}
+                  onSelectAllClick={handleSelectAllClick}
+                  headLabel={[
+                    { id: 'name', label: 'Name' },
+                    { id: 'Category', label: 'Category' },
+                    { id: 'born_date', label: 'Born Date' },
+                    { id: 'healthStatus', label: 'Health Status' },
+                    { id: 'collar Id', label: 'With Collar' },
+                    { id: '' },
+                  ]}
                 />
+                <TableBody>
+                  {dataFiltered
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <UserTableRow
+                        key={row._id}
+                        id={row._id}
+                        name={row.name}
+                        categoryName={row.categoryName}
+                        healthStatus={row.healthStatus}
+                        birth_date={row.birth_date}
+                        collarId={row.collarId}
+                        gallery={row.gallery}
+                        categoryId={row.categoryId}
+                        isVerified={row.isVerified}
+                        selected={selected.indexOf(row.name) !== -1}
+                        handleClick={(event) => handleClick(event, row.name)}
+                      />
+                    ))}
 
-                {notFound && <TableNoData query={filterName} />}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
+                  <TableEmptyRows
+                    height={77}
+                    emptyRows={emptyRows(page, rowsPerPage, users.length)}
+                  />
 
-        <TablePagination
-          page={page}
-          component="div"
-          count={users.length}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
+                  {notFound && <TableNoData query={filterName} />}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
+
+          <TablePagination
+            page={page}
+            component="div"
+            count={users.length}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[5, 10, 25]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Card>
+      ) : (
+        <div className="flex justify-center">
+          <h2>No Animals</h2>
+        </div>
+      )}
     </Container>
   );
 }

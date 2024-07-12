@@ -20,3 +20,31 @@ export const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
   password: Yup.string().required('Password is required'),
 });
+
+export const AddAnimalSchema = Yup.object().shape({
+  animal_name: Yup.string().required('Name is required'),
+  name: Yup.string().required('Name is required'),
+  // animal_category: Yup.string().required('Category is required'),
+  categoryId: Yup.string().required('Category is required'),
+  // animal_breed: Yup.string().required('Breed is required'),
+  // animal_color: Yup.string().required('Color is required'),
+  // animal_gender: Yup.string().required('Gender is required'),
+  // animal_weight: Yup.string().required('Weight is required'),
+  birth_date: Yup.string().required('Born Date is required'),
+
+  gallery: Yup.array()
+    // .min(1, `Please add at least one image into gallery`)
+    .of(
+      Yup.mixed().test('fileSize', 'Gallery Must Be Valid Images', (value) => {
+        if (value === 'undefined' || value)
+          return (
+            value &&
+            (value.type === 'image/jpg' ||
+              value.type === 'image/jpeg' ||
+              value.type === 'image/png' ||
+              value.type === 'image/webp')
+          );
+        return true;
+      })
+    ),
+});

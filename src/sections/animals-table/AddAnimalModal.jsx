@@ -13,11 +13,13 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { FilePond, registerPlugin } from 'react-filepond';
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import * as yup from 'yup';
 
 import 'filepond/dist/filepond.min.css';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import { AddAnimal } from 'src/actions/animalsActions';
 import useAuthStore from 'src/store/authStore';
+import { AddAnimalSchema } from 'src/validation/schema';
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
@@ -25,6 +27,7 @@ registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
 export default function NewAnimalModal() {
   const { user } = useAuthStore();
+
   const { categories } = user;
   // __________
   const [visible, setVisible] = useState(false);
@@ -59,35 +62,48 @@ export default function NewAnimalModal() {
       >
         <form
           onSubmit={async (e) => {
-            e.preventDefault();
-            const fd = new FormData(e.target);
-            fd.delete('filelpond');
-            // formData.birth_date = date;
-            gallery.forEach((image, index) => {
-              fd.append(`gallery[${index}]`, image);
-            });
-            // console.log(gallery);
-            fd.append('categoryId', categoryId);
-            fd.append('birth_date', date);
-            const formData = Object.fromEntries(fd.entries());
-            // console.log({ formData });
-            // ______________________________
-            if (formData.animal_name) {
-              fd.append('name', formData.animal_name);
-              await AddAnimal(categoryId, fd);
-            } else {
-              return toast.warning('All Fields are required');
+            try {
+              e.preventDefault();
+              const fd = new FormData(e.target);
+              fd.delete('filelpond');
+              gallery.forEach((image, index) => {
+                fd.append(`gallery[${index}]`, image);
+              });
+              fd.append('categoryId', categoryId);
+              fd.append('birth_date', date);
+              fd.delete(`filepond`);
+              const formData = Object.fromEntries(fd.entries());
+              // ______________________________
+              AddAnimalSchema.validateSync({ ...formData, gallery }, { abortEarly: false });
+
+              if (formData.animal_name) {
+                fd.append('name', formData.animal_name);
+                await AddAnimal(categoryId, fd);
+              } else {
+                return toast.warning('Animal Name is required');
+              }
+              setVisible(false);
+              toast.success('Animal Added Successfully ✔️');
+            } catch (error) {
+              if (error instanceof yup.ValidationError) {
+                toast.error(error.errors[0]);
+              } else {
+                toast.error(error.message);
+              }
             }
-            // setVisible(false);
           }}
           className="flex flex-col w-11/12 items-end mx-auto gap-6 mt-2"
         >
-          <TextField className="w-full mb-3" name="animal_name" label="Animal Name" />
+          <TextField
+            className="w-full mb-3"
+            name="animal_name"
+            label="Animal Name (ID / Ear Tag)"
+          />
 
           {/* <div className=" w-full card flex justify-content-center"> */}
           <FloatLabel className="w-full ">
             <Calendar
-              className="border border-zinc-200 w-full rounded-md  h-14 hover:border-zinc-800"
+              className="border border-zinc-200 w-full rounded-md  h-14 hover:border-zinc-800 pl-2"
               inputId="birth_date"
               value={date}
               onChange={(e) => setDate(e.value)}
@@ -102,9 +118,7 @@ export default function NewAnimalModal() {
             disablePortal
             id="combo-box-demo"
             options={categories.map((c) => ({ ...c, label: c.name }))}
-            // sx={{ width: 300 }}
             onChange={(_, newValue) => {
-              console.log({ newValue });
               setCategoryId(newValue?._id);
             }}
             renderInput={(params) => <TextField {...params} label="Category" />}

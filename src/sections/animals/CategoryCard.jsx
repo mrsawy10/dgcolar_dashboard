@@ -10,6 +10,7 @@ import { Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { DeleteCategory } from 'src/actions/categoryActions';
+import useAnimalsStore from 'src/store/useAnimalsStore';
 
 // ----------------------------------------------------------------------
 
@@ -22,6 +23,7 @@ export default function AppWidgetSummary({
   sx,
   ...other
 }) {
+  const { filterAnimalsByCategory } = useAnimalsStore();
   return (
     <Card
       component={Stack}
@@ -31,8 +33,21 @@ export default function AppWidgetSummary({
         px: 3,
         py: 2,
         minWidth: 250,
+        cursor: 'pointer',
         borderRadius: 2,
+        transition: (theme) => theme.transitions.create('all'),
+        color: (theme) => theme.palette[color].darker,
+        backgroundColor: (theme) => theme.palette[color].lighter,
+        '&:hover': {
+          color: (theme) => theme.palette[color].dark,
+          backgroundColor: (theme) => theme.palette[color].light,
+        },
         ...sx,
+      }}
+      // className="hover:bg-gray-100 transition-all duration-500"
+      onClick={() => {
+        console.log(`click`);
+        filterAnimalsByCategory(item._id);
       }}
       {...other}
     >
@@ -67,10 +82,10 @@ export default function AppWidgetSummary({
         </div>
       </div>
       <Stack spacing={0.5}>
-        <Typography variant="h4">{fShortenNumber(total)}</Typography>
+        <Typography variant="h4">{title}</Typography>
 
         <Typography variant="subtitle2" sx={{ color: 'text.disabled' }}>
-          {title}
+          Total : {Array.isArray(item.animals) ? item.animals.length : 0}
         </Typography>
       </Stack>
     </Card>
